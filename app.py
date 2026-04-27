@@ -30,6 +30,7 @@ st.markdown("""
     h2, h3 { font-family: 'Bebas Neue', sans-serif !important; color: var(--text); }
     div[data-testid="stFileUploader"] { color: #e8e4d8 !important; }
     [data-testid="stMetric"] { background-color: var(--bg2) !important; border: 1px solid var(--border) !important; }
+    [data-testid="stMetricLabel"] { color: var(--text) !important; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; }
     [data-testid="stMetricValue"] { color: var(--amber) !important; font-family: 'DM Mono', monospace; }
     </style>
     """, unsafe_allow_html=True)
