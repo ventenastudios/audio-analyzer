@@ -26,7 +26,8 @@ st.markdown("""
         --border: #2a2a26;
     }
     .stApp { background-color: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
-    h1, h2, h3 { font-family: 'Bebas Neue', sans-serif !important; color: var(--text); }
+    h1 { color: #e8a020 !important; font-family: 'Bebas Neue', sans-serif !important; }
+    h2, h3 { font-family: 'Bebas Neue', sans-serif !important; color: var(--text); }
     [data-testid="stMetric"] { background-color: var(--bg2) !important; border: 1px solid var(--border) !important; }
     [data-testid="stMetricValue"] { color: var(--amber) !important; font-family: 'DM Mono', monospace; }
     </style>
