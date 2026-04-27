@@ -28,6 +28,7 @@ st.markdown("""
     .stApp { background-color: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
     h1 { color: #e8a020 !important; font-family: 'Bebas Neue', sans-serif !important; }
     h2, h3 { font-family: 'Bebas Neue', sans-serif !important; color: var(--text); }
+    div[data-testid="stFileUploader"] { color: #e8e4d8 !important; }
     [data-testid="stMetric"] { background-color: var(--bg2) !important; border: 1px solid var(--border) !important; }
     [data-testid="stMetricValue"] { color: var(--amber) !important; font-family: 'DM Mono', monospace; }
     </style>
