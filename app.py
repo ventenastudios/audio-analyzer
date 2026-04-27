@@ -9,14 +9,30 @@ import io
 st.set_page_config(page_title="Audio Analyzer Plus", layout="wide")
 
 # Custom CSS for better UI
+# st.markdown("""
+#     <style>
+#     .main { background-color: #0e1117; }
+#     .stMetric { background-color: #161b22; padding: 15px; border-radius: 10px; border: 1px solid #30363d; }
+#     </style>
+#     """, unsafe_allow_html=True)
+
 st.markdown("""
     <style>
-    .main { background-color: #0e1117; }
-    .stMetric { background-color: #161b22; padding: 15px; border-radius: 10px; border: 1px solid #30363d; }
+    :root {
+        --bg: #0a0a09;
+        --bg2: #111110;
+        --amber: #e8a020;
+        --text: #e8e4d8;
+        --border: #2a2a26;
+    }
+    .stApp { background-color: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
+    h1, h2, h3 { font-family: 'Bebas Neue', sans-serif !important; color: var(--text); }
+    [data-testid="stMetric"] { background-color: var(--bg2) !important; border: 1px solid var(--border) !important; }
+    [data-testid="stMetricValue"] { color: var(--amber) !important; font-family: 'DM Mono', monospace; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("VENTENA STUDIOS TOOLS", width="stretch", text_alignment="center")
+st.title("VENTENA STUDIOS TOOLKIT", width="stretch", text_alignment="center")
 st.title("🎵 Audio Analyzer Plus 🎵", width="stretch", text_alignment="center")
 st.write("Professional mix and mastering diagnostic tool. Upload your track to get an instant technical report.")
 
