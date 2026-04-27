@@ -35,6 +35,9 @@ st.markdown("""
     [data-testid="stMetric"] { background-color: var(--bg2) !important; border: 1px solid var(--border) !important; }
     [data-testid="stMetricLabel"] { color: var(--text) !important; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; }
     [data-testid="stMetricValue"] { color: var(--amber) !important; font-family: 'DM Mono', monospace; }
+    /* Uploader e Bottoni */
+    div[data-testid="stFileUploader"] label { color: var(--text) !important; }
+    [data-testid="stFileUploader"] button p { color: var(--amber) !important; }
     </style>
     """, unsafe_allow_html=True)
 
