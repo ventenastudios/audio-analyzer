@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import io
 
 # Page Configuration
-st.set_page_config(page_title="Audio Analyzer Plus", layout="wide")
+st.set_page_config(page_title="Audio Analyzer", layout="wide")
 
 # Custom CSS for better UI
 # st.markdown("""
