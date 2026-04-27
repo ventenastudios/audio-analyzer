@@ -231,6 +231,6 @@ if uploaded_file is not None:
         
         st.pyplot(fig_spec)
         
-        st.info("Analysis: If your green line stays close to the pink dashed line, your mix balance is likely correct. "
+        st.info("Analysis: If your green line stays close to the red dashed line, your mix balance is likely correct. "
                 "Large deviations indicate masking, lack of body, or excessive harshness.")
-st.caption("Audio Analyzer Plus | Developed by VentenaStudios for Producers & Engineers | 100% Private Analysis")
+st.caption("Audio Analyzer | Developed by VentenaStudios for Producers & Engineers | 100% Private Analysis")
