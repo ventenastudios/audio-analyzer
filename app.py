@@ -48,6 +48,7 @@ st.write("Professional mix and mastering diagnostic tool. Upload your track to g
 uploaded_file = st.file_uploader("Upload your track (WAV or MP3)", type=["wav", "mp3"])
 
 if uploaded_file is not None:
+    st.audio(uploaded_file)
     with st.spinner('Analyzing audio signal... please wait.'):
         # 1. Load Audio (Stereo is mandatory for correlation)
         audio_bytes = uploaded_file.read()
