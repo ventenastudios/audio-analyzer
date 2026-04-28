@@ -235,23 +235,7 @@ if uploaded_file is not None:
                     st.success("**Solid Phase:** Good correlation. The track will translate well even on mono speakers (phones, clubs).")
 
                 # --- Mid/Side Balance Analysis ---
-                st.markdown("#### 🔀 Mid / Side Balance")
-
-                mid  = (data[0] + data[1]) / 2
-                side = (data[0] - data[1]) / 2
-
-                rms_mid  = np.sqrt(np.mean(mid**2))
-                rms_side = np.sqrt(np.mean(side**2))
-
-                db_mid  = 20 * np.log10(rms_mid  + 1e-9)
-                db_side = 20 * np.log10(rms_side + 1e-9)
-                ms_ratio = db_mid - db_side  # positive = Mid-heavy, negative = Side-heavy
-
-                c1, c2 = st.columns(2)
-                c1.metric("Mid RMS",  f"{db_mid:.1f} dB")
-                c2.metric("Side RMS", f"{db_side:.1f} dB")
-                st.metric("M/S Ratio (Mid over Side)", f"{ms_ratio:+.1f} dB")
-
+                
                 # Feedback testuale
                 if ms_ratio > 12:
                     st.warning("**Very Mid-Heavy:** The mix is very centered. It may sound narrow or lacking stereo dimension. "
