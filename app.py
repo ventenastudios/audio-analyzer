@@ -311,6 +311,8 @@ if uploaded_file is not None:
             "⚠️ Gain reduction is applied automatically by platforms when your track exceeds the target. "
             "A pure gain reduction preserves the Crest Factor (dynamics). "
             "FAIL means the adjusted True Peak would still exceed the platform's limit, indicating a risk of inter-sample distortion."
+            "📌 Note: This tool simulates linear gain normalization only. Real platform behavior may differ due to lossy transcoding "
+            "(AAC/OGG Vorbis), which can inflate inter-sample peaks after encoding — even before normalization is applied. "
         )
         
         # --- TECHNICAL FEEDBACK ---
