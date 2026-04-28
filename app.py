@@ -137,6 +137,48 @@ if uploaded_file is not None:
         m_col5.metric("Correlation", f"{correlation:.2f}")
         m_col5.caption("Ideal Range: 0.2 to 0.9")
 
+        # Correlation Gauge (semicircular VU-style via Plotly)
+        if is_stereo:
+            import plotly.graph_objects as go as go_gauge
+
+            gauge_val = (correlation + 1) / 2  # remap [-1, +1] → [0, 1]
+
+            fig_corr = go.Figure(go.Indicator(
+                mode="gauge+number",
+                value=correlation,
+                number={"font": {"color": "#e8a020", "size": 18}, "suffix": ""},
+                gauge={
+                    "axis": {
+                        "range": [-1, 1],
+                        "tickvals": [-1, -0.5, 0, 0.2, 0.5, 0.9, 1],
+                        "ticktext": ["-1", "-0.5", "0", "0.2", "0.5", "0.9", "+1"],
+                        "tickfont": {"color": "#e8e4d8", "size": 9},
+                        "linecolor": "#2a2a26",
+                    },
+                    "bar": {"color": "#e8a020", "thickness": 0.25},
+                    "bgcolor": "#111110",
+                    "borderwidth": 0,
+                    "steps": [
+                        {"range": [-1, 0],    "color": "#3d0000"},   # danger: phase issues
+                        {"range": [0, 0.2],   "color": "#5a3a00"},   # warning: borderline
+                        {"range": [0.2, 0.9], "color": "#003d1a"},   # good zone
+                        {"range": [0.9, 1],   "color": "#5a3a00"},   # too mono
+                    ],
+                    "threshold": {
+                        "line": {"color": "#ff007c", "width": 2},
+                        "thickness": 0.75,
+                        "value": correlation,
+                    },
+                },
+            ))
+            fig_corr.update_layout(
+                paper_bgcolor="#0a0a09",
+                font={"color": "#e8e4d8"},
+                height=160,
+                margin=dict(t=20, b=0, l=10, r=10),
+            )
+            m_col5.plotly_chart(fig_corr, use_container_width=True)
+        
         st.divider()
 
            # --- TECHNICAL FEEDBACK ---
@@ -165,14 +207,54 @@ if uploaded_file is not None:
         with col_fb2:
             st.markdown("### 🧬 Stereo & Phase")
             if is_stereo:
+                # Phase correlation feedback
                 if correlation < 0:
                     st.error("**Phase Issues:** Negative correlation detected. Your track will lose significant elements (like bass or vocals) when played in Mono.")
+                elif correlation < 0.2:
+                    st.warning("**Very Wide / Risky:** Correlation is very low. The mix may feel artificially wide and could sound thin or broken in Mono.")
                 elif correlation < 0.4:
                     st.warning("**Wide/Thin:** Low correlation. The mix is very wide, but check for mono compatibility.")
+                elif correlation > 0.95:
+                    st.info("**Near-Mono:** Correlation is very high. The mix is safe in Mono but may lack stereo width and excitement.")
                 else:
-                    st.success("**Solid Phase:** Good correlation. The track will sound great even on mono speakers (phones, clubs).")
+                    st.success("**Solid Phase:** Good correlation. The track will translate well even on mono speakers (phones, clubs).")
+
+                # --- Mid/Side Balance Analysis ---
+                st.markdown("#### 🔀 Mid / Side Balance")
+
+                mid  = (data[0] + data[1]) / 2
+                side = (data[0] - data[1]) / 2
+
+                rms_mid  = np.sqrt(np.mean(mid**2))
+                rms_side = np.sqrt(np.mean(side**2))
+
+                db_mid  = 20 * np.log10(rms_mid  + 1e-9)
+                db_side = 20 * np.log10(rms_side + 1e-9)
+                ms_ratio = db_mid - db_side  # positive = Mid-heavy, negative = Side-heavy
+
+                c1, c2 = st.columns(2)
+                c1.metric("Mid RMS",  f"{db_mid:.1f} dB")
+                c2.metric("Side RMS", f"{db_side:.1f} dB")
+                st.metric("M/S Ratio (Mid over Side)", f"{ms_ratio:+.1f} dB")
+
+                # Feedback testuale
+                if ms_ratio > 12:
+                    st.warning("**Very Mid-Heavy:** The mix is very centered. It may sound narrow or lacking stereo dimension. "
+                               "Consider widening reverbs, delays, or using a stereo imager on the master bus.")
+                elif ms_ratio > 6:
+                    st.success("**Balanced / Slightly Mid-Heavy:** Good mono foundation with a controlled stereo image. "
+                               "Typical of well-mixed pop, rock, and hip-hop.")
+                elif ms_ratio > 0:
+                    st.success("**Well Balanced:** Mid and Side are well balanced. The mix should translate well across all playback systems.")
+                elif ms_ratio > -6:
+                    st.warning("**Slightly Side-Heavy:** The stereo image is wide. Check mono compatibility carefully, "
+                               "especially for bass content in the Side channel.")
+                else:
+                    st.error("**Dangerously Wide:** The Side signal dominates. Significant energy will be lost or phase-cancelled in Mono. "
+                             "Reduce stereo widening or check for Mid/Side encoding issues.")
+
             else:
-                st.info("Mono file: No phase correlation available.")
+                st.info("Mono file: No phase or M/S analysis available.")
 
         
         # --- LOUDNESS PENALTY VISUALIZER ---
