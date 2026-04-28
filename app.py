@@ -139,6 +139,41 @@ if uploaded_file is not None:
 
         st.divider()
 
+           # --- TECHNICAL FEEDBACK ---
+        st.subheader("💡 Technical Feedback & Improvements")
+        
+        col_fb1, col_fb2 = st.columns(2)
+
+        with col_fb1:
+            st.markdown("### 🎚️ Dynamic & Level")
+            # Loudness Logic
+            if integrated_loudness > -10:
+                st.error("**Oversquashed:** Your track is very loud. It will be turned down by streaming platforms. Try to ease up on the Limiter.")
+            elif integrated_loudness < -15:
+                st.warning("**Low Level:** The track might sound quiet. You have headroom to increase the loudness for a more competitive master.")
+            else:
+                st.success("**Target Reached:** Your loudness is ideal for modern streaming standards.")
+
+            # Peak Logic
+            if true_peak_db > -0.5:
+                st.error("**Clipping Risk:** Peaks are too close to 0dB. Lower your Limiter's Ceiling to -1.0 dBTP to avoid inter-sample peaks.")
+            
+            # LRA Logic
+            if lra < 4:
+                st.info("**Small LRA:** Very consistent volume, typical of heavy EDM/Pop. If this is Jazz/Rock, you might be over-compressing.")
+
+        with col_fb2:
+            st.markdown("### 🧬 Stereo & Phase")
+            if is_stereo:
+                if correlation < 0:
+                    st.error("**Phase Issues:** Negative correlation detected. Your track will lose significant elements (like bass or vocals) when played in Mono.")
+                elif correlation < 0.4:
+                    st.warning("**Wide/Thin:** Low correlation. The mix is very wide, but check for mono compatibility.")
+                else:
+                    st.success("**Solid Phase:** Good correlation. The track will sound great even on mono speakers (phones, clubs).")
+            else:
+                st.info("Mono file: No phase correlation available.")
+
         
         # --- LOUDNESS PENALTY VISUALIZER ---
         st.divider()
@@ -315,40 +350,6 @@ if uploaded_file is not None:
             "(AAC/OGG Vorbis), which can inflate inter-sample peaks after encoding — even before normalization is applied. "
         )
         
-        # --- TECHNICAL FEEDBACK ---
-        st.subheader("💡 Technical Feedback & Improvements")
-        
-        col_fb1, col_fb2 = st.columns(2)
-
-        with col_fb1:
-            st.markdown("### 🎚️ Dynamic & Level")
-            # Loudness Logic
-            if integrated_loudness > -10:
-                st.error("**Oversquashed:** Your track is very loud. It will be turned down by streaming platforms. Try to ease up on the Limiter.")
-            elif integrated_loudness < -15:
-                st.warning("**Low Level:** The track might sound quiet. You have headroom to increase the loudness for a more competitive master.")
-            else:
-                st.success("**Target Reached:** Your loudness is ideal for modern streaming standards.")
-
-            # Peak Logic
-            if true_peak_db > -0.5:
-                st.error("**Clipping Risk:** Peaks are too close to 0dB. Lower your Limiter's Ceiling to -1.0 dBTP to avoid inter-sample peaks.")
-            
-            # LRA Logic
-            if lra < 4:
-                st.info("**Small LRA:** Very consistent volume, typical of heavy EDM/Pop. If this is Jazz/Rock, you might be over-compressing.")
-
-        with col_fb2:
-            st.markdown("### 🧬 Stereo & Phase")
-            if is_stereo:
-                if correlation < 0:
-                    st.error("**Phase Issues:** Negative correlation detected. Your track will lose significant elements (like bass or vocals) when played in Mono.")
-                elif correlation < 0.4:
-                    st.warning("**Wide/Thin:** Low correlation. The mix is very wide, but check for mono compatibility.")
-                else:
-                    st.success("**Solid Phase:** Good correlation. The track will sound great even on mono speakers (phones, clubs).")
-            else:
-                st.info("Mono file: No phase correlation available.")
 
         # --- VISUALIZATION ---
         st.subheader("📈 Waveform Visualization")
