@@ -4,4 +4,4 @@ numpy
 pyloudnorm
 soundfile
 matplotlib
-plotply
+plotly
