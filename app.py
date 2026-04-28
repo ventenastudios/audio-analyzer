@@ -139,6 +139,180 @@ if uploaded_file is not None:
 
         st.divider()
 
+        
+        # --- LOUDNESS PENALTY VISUALIZER ---
+        st.divider()
+        st.subheader("📉 Loudness Penalty Visualizer")
+        st.write("How much your track will be turned down (or up) by major streaming platforms, and whether your dynamics survive the gain reduction.")
+
+        import plotly.graph_objects as go
+
+        # --- Streaming Platform Standards ---
+        platforms = {
+            "Spotify":      {"target": -14.0, "peak_limit": -1.0},
+            "YouTube":      {"target": -14.0, "peak_limit": -1.0},
+            "Apple Music":  {"target": -16.0, "peak_limit": -1.0},
+            "Tidal":        {"target": -14.0, "peak_limit": -1.0},
+            "Deezer":       {"target": -15.0, "peak_limit": -1.0},
+            "Amazon Music": {"target": -14.0, "peak_limit": -2.0},
+            "SoundCloud":   {"target": -14.0, "peak_limit": -1.0},
+        }
+
+        # --- Penalty Calculation ---
+        penalty_data = []
+        for platform, specs in platforms.items():
+            target = specs["target"]
+            penalty = integrated_loudness - target  # positive = gain reduction applied
+            adjusted_lufs = integrated_loudness - max(penalty, 0)
+            adjusted_peak = true_peak_db - max(penalty, 0)
+            peak_ok = adjusted_peak <= specs["peak_limit"]
+            lufs_ok = integrated_loudness <= target + 1.0  # 1 LU tolerance
+            penalty_data.append({
+                "platform": platform,
+                "target": target,
+                "penalty_db": round(penalty, 2),
+                "adjusted_peak": round(adjusted_peak, 2),
+                "peak_limit": specs["peak_limit"],
+                "peak_ok": peak_ok,
+                "lufs_ok": lufs_ok,
+                "pass": peak_ok,  # key check: clipping after gain reduction
+            })
+
+        # --- Plotly Bar Chart ---
+        platform_names = [d["platform"] for d in penalty_data]
+        penalties = [d["penalty_db"] for d in penalty_data]
+        colors = ["#e8a020" if p > 0 else "#00ff9f" for p in penalties]
+
+        fig_penalty = go.Figure()
+
+        # Penalty bars
+        fig_penalty.add_trace(go.Bar(
+            name="Gain Applied (dB)",
+            x=platform_names,
+            y=[-p for p in penalties],  # negative = reduction, positive = boost
+            marker_color=colors,
+            text=[f"{-p:+.1f} dB" for p in penalties],
+            textposition="outside",
+            textfont=dict(color="white", size=12),
+        ))
+
+        # Reference line at 0
+        fig_penalty.add_hline(
+            y=0,
+            line_dash="dot",
+            line_color="white",
+            opacity=0.5,
+            annotation_text="No change",
+            annotation_font_color="white",
+        )
+
+        # Crest Factor preservation overlay as scatter
+        # Simulate crest factor after gain reduction (linear gain doesn't affect CF)
+        # But if track is boosted (penalty < 0) and peak would clip, CF is compromised
+        cf_colors = []
+        cf_symbols = []
+        cf_texts = []
+        for d in penalty_data:
+            if d["penalty_db"] < 0:
+                # Track would be boosted but peak might clip → platform won't boost
+                cf_colors.append("#aaaaaa")
+                cf_symbols.append("circle-open")
+                cf_texts.append("No boost applied")
+            elif d["peak_ok"]:
+                cf_colors.append("#00ff9f")
+                cf_symbols.append("circle")
+                cf_texts.append("Dynamics preserved")
+            else:
+                cf_colors.append("#ff007c")
+                cf_symbols.append("x")
+                cf_texts.append("Peak clips after reduction!")
+
+        fig_penalty.add_trace(go.Scatter(
+            name="Dynamics Status",
+            x=platform_names,
+            y=[-p + 0.4 for p in penalties],
+            mode="markers+text",
+            marker=dict(size=14, color=cf_colors, symbol=cf_symbols, line=dict(width=2, color=cf_colors)),
+            text=cf_texts,
+            textposition="top center",
+            textfont=dict(size=9, color="white"),
+        ))
+
+        fig_penalty.update_layout(
+            paper_bgcolor="#111110",
+            plot_bgcolor="#0a0a09",
+            font=dict(color="#e8e4d8", family="DM Sans"),
+            xaxis=dict(
+                title="Platform",
+                tickfont=dict(color="#e8e4d8"),
+                gridcolor="#2a2a26",
+            ),
+            yaxis=dict(
+                title="Gain Applied to Your Track (dB)",
+                tickfont=dict(color="#e8e4d8"),
+                gridcolor="#2a2a26",
+                zeroline=False,
+            ),
+            legend=dict(
+                bgcolor="#111110",
+                bordercolor="#2a2a26",
+                borderwidth=1,
+            ),
+            margin=dict(t=40, b=60),
+            height=420,
+            bargap=0.35,
+            annotations=[
+                dict(
+                    text=(
+                        f"Your track: <b>{integrated_loudness:.1f} LUFS</b> | "
+                        f"True Peak: <b>{true_peak_db:.2f} dBTP</b> | "
+                        f"LRA: <b>{lra:.1f} LU</b>"
+                    ),
+                    xref="paper", yref="paper",
+                    x=0.01, y=1.07,
+                    showarrow=False,
+                    font=dict(size=12, color="#e8a020"),
+                    align="left",
+                )
+            ],
+        )
+
+        st.plotly_chart(fig_penalty, use_container_width=True)
+
+        # --- Pass/Fail Table ---
+        st.markdown("### ✅ Streaming Standards Check")
+
+        header_cols = st.columns([2, 1.5, 1.5, 1.5, 1.5, 1.5])
+        headers = ["Platform", "Target LUFS", "Your LUFS", "Gain Applied", "Adj. Peak", "Status"]
+        for col, h in zip(header_cols, headers):
+            col.markdown(f"**{h}**")
+
+        st.markdown("<hr style='border:1px solid #2a2a26; margin:4px 0'>", unsafe_allow_html=True)
+
+        for d in penalty_data:
+            row_cols = st.columns([2, 1.5, 1.5, 1.5, 1.5, 1.5])
+            gain_str = f"{-d['penalty_db']:+.1f} dB" if d["penalty_db"] > 0 else "0.0 dB (no boost)"
+            
+            if d["pass"] and d["penalty_db"] <= 0:
+                status = "🟢 PASS (quiet)"
+            elif d["pass"]:
+                status = "🟢 PASS"
+            else:
+                status = "🔴 FAIL (peak clip)"
+
+            row_cols[0].write(d["platform"])
+            row_cols[1].write(f"{d['target']:.1f} LUFS")
+            row_cols[2].write(f"{integrated_loudness:.1f} LUFS")
+            row_cols[3].write(gain_str)
+            row_cols[4].write(f"{d['adjusted_peak']:.2f} dBTP")
+            row_cols[5].write(status)
+
+        st.caption(
+            "⚠️ Gain reduction is applied automatically by platforms when your track exceeds the target. "
+            "A pure gain reduction preserves the Crest Factor (dynamics). "
+            "FAIL means the adjusted True Peak would still exceed the platform's limit, indicating a risk of inter-sample distortion."
+        )
+        
         # --- TECHNICAL FEEDBACK ---
         st.subheader("💡 Technical Feedback & Improvements")
         
