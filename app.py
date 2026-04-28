@@ -150,8 +150,6 @@ if uploaded_file is not None:
                 gauge={
                     "axis": {
                         "range": [-1, 1],
-                        "tickfont": {"color": "#e8e4d8", "size": 9},
-                        "linecolor": "#2a2a26",
                         "dtick": 0.5,
                     },
                     "bar": {"color": "#e8a020", "thickness": 0.25},
