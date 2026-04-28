@@ -175,6 +175,24 @@ if uploaded_file is not None:
                 margin=dict(t=20, b=0, l=10, r=10),
             )
             m_col5.plotly_chart(fig_corr, use_container_width=True)
+
+        # Mid/Side metrics row (stereo only)
+        if is_stereo:
+            st.markdown("#### 🔀 Mid / Side Balance")
+            mid  = (data[0] + data[1]) / 2
+            side = (data[0] - data[1]) / 2
+
+            rms_mid  = np.sqrt(np.mean(mid**2))
+            rms_side = np.sqrt(np.mean(side**2))
+
+            db_mid  = 20 * np.log10(rms_mid  + 1e-9)
+            db_side = 20 * np.log10(rms_side + 1e-9)
+            ms_ratio = db_mid - db_side
+
+            ms_col1, ms_col2, ms_col3 = st.columns(3)
+            ms_col1.metric("Mid RMS",  f"{db_mid:.1f} dB")
+            ms_col2.metric("Side RMS", f"{db_side:.1f} dB")
+            ms_col3.metric("M/S Ratio (Mid over Side)", f"{ms_ratio:+.1f} dB")
         
         st.divider()
 
