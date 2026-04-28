@@ -42,7 +42,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 st.title("VENTENA STUDIOS TOOLKIT", width="stretch", text_alignment="center")
-st.title("🎵 Audio Analyzer Plus 🎵", width="stretch", text_alignment="center")
+st.title("🎵 Audio Analyzer 🎵", width="stretch", text_alignment="center")
 st.write("Professional mix and mastering diagnostic tool. Upload your track to get an instant technical report.")
 
 uploaded_file = st.file_uploader("Upload your track (WAV or MP3)", type=["wav", "mp3"])
