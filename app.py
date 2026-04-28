@@ -139,7 +139,7 @@ if uploaded_file is not None:
 
         # Correlation Gauge (semicircular VU-style via Plotly)
         if is_stereo:
-            import plotly.graph_objects as go as go_gauge
+            import plotly.graph_objects as go
 
             gauge_val = (correlation + 1) / 2  # remap [-1, +1] → [0, 1]
 
