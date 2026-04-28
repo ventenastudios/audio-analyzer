@@ -146,23 +146,22 @@ if uploaded_file is not None:
             fig_corr = go.Figure(go.Indicator(
                 mode="gauge+number",
                 value=correlation,
-                number={"font": {"color": "#e8a020", "size": 18}, "suffix": ""},
+                number={"font": {"color": "#e8a020", "size": 18}},
                 gauge={
                     "axis": {
                         "range": [-1, 1],
-                        "tickvals": [-1, -0.5, 0, 0.2, 0.5, 0.9, 1],
-                        "ticktext": ["-1", "-0.5", "0", "0.2", "0.5", "0.9", "+1"],
                         "tickfont": {"color": "#e8e4d8", "size": 9},
                         "linecolor": "#2a2a26",
+                        "dtick": 0.5,
                     },
                     "bar": {"color": "#e8a020", "thickness": 0.25},
                     "bgcolor": "#111110",
                     "borderwidth": 0,
                     "steps": [
-                        {"range": [-1, 0],    "color": "#3d0000"},   # danger: phase issues
-                        {"range": [0, 0.2],   "color": "#5a3a00"},   # warning: borderline
-                        {"range": [0.2, 0.9], "color": "#003d1a"},   # good zone
-                        {"range": [0.9, 1],   "color": "#5a3a00"},   # too mono
+                        {"range": [-1, 0],    "color": "#3d0000"},
+                        {"range": [0, 0.2],   "color": "#5a3a00"},
+                        {"range": [0.2, 0.9], "color": "#003d1a"},
+                        {"range": [0.9, 1],   "color": "#5a3a00"},
                     ],
                     "threshold": {
                         "line": {"color": "#ff007c", "width": 2},
